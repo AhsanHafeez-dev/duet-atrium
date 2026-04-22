@@ -1,0 +1,11 @@
+app/api/documents/route.ts(15,9): error TS7034: Variable 'documents' implicitly has type 'any[]' in some locations where its type cannot be determined.
+app/api/documents/route.ts(24,25): error TS2561: Object literal may only specify known properties, but 'uploadedBy' does not exist in type 'DocumentInclude<DefaultArgs>'. Did you mean to write 'uploader'?
+app/api/documents/route.ts(39,14): error TS2561: Object literal may only specify known properties, but 'uploadedBy' does not exist in type 'DocumentInclude<DefaultArgs>'. Did you mean to write 'uploader'?
+app/api/documents/route.ts(46,47): error TS7005: Variable 'documents' implicitly has an 'any[]' type.
+app/api/documents/route.ts(80,11): error TS2561: Object literal may only specify known properties, but 'uploadedById' does not exist in type 'Without<DocumentCreateInput, DocumentUncheckedCreateInput> & DocumentUncheckedCreateInput'. Did you mean to write 'uploaderId'?
+app/api/proposals/[id]/review/route.ts(31,42): error TS2367: This comparison appears to be unintentional because the types '"ACCEPTED" | "REJECTED" | "EXPIRED" | "WITHDRAWN"' and '"REVISION_REQUESTED"' have no overlap.
+app/api/teacher/dashboard/route.ts(27,19): error TS2353: Object literal may only specify known properties, and 'createdAt' does not exist in type 'ProposalOrderByWithRelationInput | ProposalOrderByWithRelationInput[]'.
+app/api/teacher/dashboard/route.ts(36,19): error TS2353: Object literal may only specify known properties, and 'createdAt' does not exist in type 'ProposalOrderByWithRelationInput | ProposalOrderByWithRelationInput[]'.
+app/layout.tsx(20,35): error TS2339: Property 'get' does not exist on type 'Promise<ReadonlyHeaders>'.
+app/proposals/new/page.tsx(151,19): error TS2322: Type '{ children: string; class: string; }' is not assignable to type 'DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>'.
+  Property 'class' does not exist on type 'DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement>'. Did you mean 'className'?

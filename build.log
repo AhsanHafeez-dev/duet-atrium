@@ -1,0 +1,73 @@
+
+> fyp-portal@0.1.0 build
+> next build
+
+▲ Next.js 16.2.4 (Turbopack)
+
+⚠ The "middleware" file convention is deprecated. Please use "proxy" instead. Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
+  Creating an optimized production build ...
+Found 2 warnings while optimizing generated CSS:
+
+Issue #1:
+[2m│   }[22m
+[2m│ }[22m
+[2m│[22m @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");
+[2m┆[22m        [33m[2m^--[22m @import rules must precede all rules aside from @charset and @layer statements[39m
+[2m┆[22m
+[2m│ @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");[22m
+[2m│ *,[22m
+
+Issue #2:
+[2m│ }[22m
+[2m│ @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap");[22m
+[2m│[22m @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap");
+[2m┆[22m        [33m[2m^--[22m @import rules must precede all rules aside from @charset and @layer statements[39m
+[2m┆[22m
+[2m│ *,[22m
+[2m│ *::before,[22m
+
+✓ Compiled successfully in 10.2s
+  Running TypeScript ...
+  Finished TypeScript in 16.4s ...
+  Collecting page data using 7 workers ...
+  Generating static pages using 7 workers (0/25) ...
+  Generating static pages using 7 workers (6/25) 
+  Generating static pages using 7 workers (12/25) 
+  Generating static pages using 7 workers (18/25) 
+✓ Generating static pages using 7 workers (25/25) in 2.1s
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ƒ /_not-found
+├ ƒ /api/admin/portal-lock
+├ ƒ /api/auth/login
+├ ƒ /api/auth/logout
+├ ƒ /api/auth/me
+├ ƒ /api/auth/refresh
+├ ƒ /api/auth/signup
+├ ƒ /api/auth/verify-otp
+├ ƒ /api/documents
+├ ƒ /api/faculty
+├ ƒ /api/groups
+├ ƒ /api/groups/invite
+├ ƒ /api/groups/invites/[id]/accept
+├ ƒ /api/onboarding
+├ ƒ /api/portal-status
+├ ƒ /api/proposals
+├ ƒ /api/proposals/[id]
+├ ƒ /api/proposals/[id]/review
+├ ƒ /api/teacher/dashboard
+├ ƒ /auth/login
+├ ƒ /dashboard
+├ ƒ /documents
+├ ƒ /faculty
+├ ƒ /onboarding
+├ ƒ /proposals/[id]
+└ ƒ /proposals/new
+
+
+ƒ Proxy (Middleware)
+
+ƒ  (Dynamic)  server-rendered on demand
+

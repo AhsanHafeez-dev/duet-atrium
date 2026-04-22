@@ -1,0 +1,2 @@
+app/api/documents/route.ts(15,9): error TS7034: Variable 'documents' implicitly has type 'any[]' in some locations where its type cannot be determined.
+app/api/documents/route.ts(46,47): error TS7005: Variable 'documents' implicitly has an 'any[]' type.

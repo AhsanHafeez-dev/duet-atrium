@@ -1,0 +1,239 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+model Announcement {
+  id            String             @id
+  authorId      String
+  targetType    AnnouncementTarget
+  targetGroupId String?
+  title         String
+  body          String
+  createdAt     DateTime           @default(now())
+  author        User               @relation(fields: [authorId], references: [id])
+  targetGroup   Group?             @relation(fields: [targetGroupId], references: [id])
+}
+
+model Document {
+  id           String         @id
+  groupId      String
+  proposalId   String?
+  uploaderId   String
+  filename     String
+  publicId     String
+  url          String
+  fileType     String
+  fileSize     Int
+  version      Int            @default(1)
+  status       DocumentStatus @default(PENDING_REVIEW)
+  reviewedById String?
+  reviewedAt   DateTime?
+  createdAt    DateTime       @default(now())
+  group        Group          @relation(fields: [groupId], references: [id])
+  proposal     Proposal?      @relation(fields: [proposalId], references: [id])
+  uploader     User           @relation(fields: [uploaderId], references: [id])
+
+  @@index([groupId])
+}
+
+model Group {
+  id           String            @id
+  leaderId     String
+  coLeaderId   String?
+  status       GroupStatus       @default(FORMING)
+  maxSize      Int               @default(4)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  announcements Announcement[]
+  documents    Document[]
+  coLeader     User?             @relation("GroupCoLeader", fields: [coLeaderId], references: [id])
+  leader       User              @relation("GroupLeader", fields: [leaderId], references: [id])
+  invitations  GroupInvitation[]
+  members      GroupMember[]
+  proposals    Proposal[]
+}
+
+model GroupInvitation {
+  id         String           @id
+  groupId    String
+  senderId   String
+  inviteeId  String
+  token      String           @unique
+  status     InvitationStatus @default(PENDING)
+  expiresAt  DateTime
+  createdAt  DateTime         @default(now())
+  group      Group            @relation(fields: [groupId], references: [id])
+  invitee    User             @relation("Invitee", fields: [inviteeId], references: [id])
+  sender     User             @relation("Sender", fields: [senderId], references: [id])
+
+  @@index([inviteeId])
+  @@index([token])
+}
+
+model GroupMember {
+  id        String     @id @default(cuid())
+  groupId   String
+  studentId String     @unique
+  role      MemberRole @default(MEMBER)
+  joinedAt  DateTime   @default(now())
+  group     Group      @relation(fields: [groupId], references: [id])
+  student   User       @relation(fields: [studentId], references: [id])
+
+  @@unique([groupId, studentId])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  type      NotificationType
+  message   String
+  isRead    Boolean          @default(false)
+  relatedId String?
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id])
+
+  @@index([userId, isRead])
+}
+
+model PortalConfig {
+  id         Int       @id @default(1)
+  isLocked   Boolean   @default(false)
+  lockedAt   DateTime?
+  lockedById String?
+  lockedBy   User?     @relation(fields: [lockedById], references: [id])
+}
+
+model Proposal {
+  id               String         @id
+  groupId          String
+  teacherId        String
+  title            String
+  titleNormalized  String
+  abstract         String
+  problemStatement String
+  proposedStack    String[]       @default([])
+  status           ProposalStatus @default(PENDING)
+  rejectionComment String?
+  submittedAt      DateTime       @default(now())
+  respondedAt      DateTime?
+  expiresAt        DateTime
+  submittedById    String?
+  researchPapers   String[]       @default([])
+  diagramUrl       String?
+  presentationUrl  String?
+  documents        Document[]
+  group            Group          @relation(fields: [groupId], references: [id])
+  submittedBy      User?          @relation("ProposalSubmitter", fields: [submittedById], references: [id])
+  teacher          User           @relation("ProposalTeacher", fields: [teacherId], references: [id])
+
+  @@unique([teacherId, titleNormalized])
+  @@index([groupId])
+  @@index([status])
+  @@index([teacherId])
+}
+
+model User {
+  id                  String            @id
+  email               String            @unique
+  passwordHash        String
+  role                Role
+  isVerified          Boolean           @default(false)
+  isOnboarded         Boolean           @default(false)
+  otp                 String?
+  otpExpiry           DateTime?
+  otpResendCount      Int               @default(0)
+  otpResendReset      DateTime?
+  rollNumber          String?
+  batch               String?
+  program             String?
+  designation         String?
+  domainTags          String[]          @default([])
+  bio                 String?
+  scholarLink         String?
+  researchGateLink    String?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+  profileImage        String?
+  announcements       Announcement[]
+  uploadedDocuments   Document[]
+  coLedGroups         Group[]           @relation("GroupCoLeader")
+  ledGroups           Group[]           @relation("GroupLeader")
+  receivedInvitations GroupInvitation[] @relation("Invitee")
+  sentInvitations     GroupInvitation[] @relation("Sender")
+  membership          GroupMember?
+  notifications       Notification[]
+  PortalConfig        PortalConfig[]
+  submittedProposals  Proposal[]        @relation("ProposalSubmitter")
+  reviewedProposals   Proposal[]        @relation("ProposalTeacher")
+
+  @@index([email])
+  @@index([role])
+}
+
+enum AnnouncementTarget {
+  SPECIFIC_GROUP
+  ALL_SUPERVISED
+  ALL_ACTIVE
+}
+
+enum DocumentStatus {
+  PENDING_REVIEW
+  REVIEWED
+  NEEDS_REVISION
+}
+
+enum GroupStatus {
+  FORMING
+  ACTIVE
+  FROZEN
+  DISSOLVED
+}
+
+enum InvitationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  EXPIRED
+}
+
+enum MemberRole {
+  LEADER
+  CO_LEADER
+  MEMBER
+}
+
+enum NotificationType {
+  GROUP_INVITATION
+  INVITE_ACCEPTED
+  INVITE_REJECTED
+  PROPOSAL_SUBMITTED
+  PROPOSAL_ACCEPTED
+  PROPOSAL_REJECTED
+  PROPOSAL_EXPIRED
+  ANNOUNCEMENT
+  PROGRESS_REPORT_REQUEST
+  DOCUMENT_SUBMITTED
+  GROUP_FROZEN
+  MEMBER_REMOVED
+}
+
+enum ProposalStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  REVISION_REQUESTED
+  WITHDRAWN
+  EXPIRED
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
