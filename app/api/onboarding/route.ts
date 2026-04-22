@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyAccessToken } from "@/lib/auth";
-import { cookies } from "next/headers";
+import { verifyAccessToken, getServerAuthToken } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 import { uploadBase64Image } from "@/lib/cloudinary";
 
 export async function POST(req: Request) {
   try {
-    const token = (await cookies()).get("access_token")?.value;
+    const token = getServerAuthToken(req);
     if (!token) {
        return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
