@@ -64,7 +64,7 @@ model GroupInvitation {
   groupId    String
   senderId   String
   inviteeId  String
-  token      String           @unique
+  token      String           @unique @default(cuid())
   status     InvitationStatus @default(PENDING)
   expiresAt  DateTime
   createdAt  DateTime         @default(now())
