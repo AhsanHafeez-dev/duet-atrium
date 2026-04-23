@@ -170,7 +170,7 @@ model User {
   notifications       Notification[]
   PortalConfig        PortalConfig[]
   submittedProposals  Proposal[]        @relation("ProposalSubmitter")
-  reviewedProposals   Proposal[]        @relation("ProposalTeacher")
+  supervisedProposals  Proposal[]        @relation("ProposalTeacher")
 
   @@index([email])
   @@index([role])
