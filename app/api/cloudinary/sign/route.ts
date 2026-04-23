@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { generateSignedUploadParams } from "@/lib/auth"; // Wait, I put it in lib/cloudinary.ts
 import { generateSignedUploadParams as signParams } from "@/lib/cloudinary";
 import { verifyAccessToken, getServerAuthToken } from "@/lib/auth";
 
