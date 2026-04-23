@@ -9,7 +9,7 @@ datasource db {
 }
 
 model Announcement {
-  id            String             @id
+  id            String             @id @default(cuid())
   authorId      String
   targetType    AnnouncementTarget
   targetGroupId String?
@@ -21,7 +21,7 @@ model Announcement {
 }
 
 model Document {
-  id           String         @id
+  id           String         @id @default(cuid())
   groupId      String
   proposalId   String?
   uploaderId   String
@@ -43,7 +43,7 @@ model Document {
 }
 
 model Group {
-  id           String            @id
+  id           String            @id @default(cuid())
   leaderId     String
   coLeaderId   String?
   status       GroupStatus       @default(FORMING)
@@ -60,7 +60,7 @@ model Group {
 }
 
 model GroupInvitation {
-  id         String           @id
+  id         String           @id @default(cuid())
   groupId    String
   senderId   String
   inviteeId  String
@@ -110,7 +110,7 @@ model PortalConfig {
 }
 
 model Proposal {
-  id               String         @id
+  id               String         @id @default(cuid())
   groupId          String
   teacherId        String
   title            String
@@ -139,7 +139,7 @@ model Proposal {
 }
 
 model User {
-  id                  String            @id
+  id                  String            @id @default(cuid())
   email               String            @unique
   passwordHash        String
   role                Role
