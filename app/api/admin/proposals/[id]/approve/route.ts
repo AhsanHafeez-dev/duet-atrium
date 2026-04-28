@@ -40,10 +40,13 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         data: { status: "REJECTED" }
       });
 
-      // 3. Update group status to ACTIVE if needed
+      // 3. Update group status to ACTIVE and assign the supervisor
       await tx.group.update({
         where: { id: proposal.groupId },
-        data: { status: "ACTIVE" }
+        data: { 
+           status: "ACTIVE",
+           supervisorId: proposal.teacherId
+        }
       });
     });
 
