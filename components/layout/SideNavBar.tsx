@@ -30,6 +30,7 @@ export default function SideNavBar({ role }: { role: string }) {
            { href: "/admin/users", label: "Manage Users", icon: "manage_accounts" },
            { href: "/admin/proposals", label: "All Proposals", icon: "description" },
            { href: "/documents", label: "Documents", icon: "folder" },
+           { href: "/announcements", label: "Announcements", icon: "campaign" },
            { href: "/admin/settings", label: "Portal Settings", icon: "settings" },
          ]
       default:

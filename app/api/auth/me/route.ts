@@ -25,6 +25,7 @@ export async function GET(req: Request) {
          batch: true,
          program: true,
          designation: true,
+         profileImage: true,
          membership: {
            select: {
              role: true,

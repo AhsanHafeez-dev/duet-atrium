@@ -17,6 +17,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+    console.log("[Onboarding API] Payload received:", body);
     const { password, profileImageUrl, profileImageBase64 } = body;
 
     if (!password || password.length < 6) {
@@ -30,8 +31,8 @@ export async function POST(req: Request) {
       isOnboarded: true
     };
 
-    if (profileImageUrl) {
-       dbUpdateData.profileImage = profileImageUrl;
+    if (body.hasOwnProperty('profileImageUrl') && body.profileImageUrl !== undefined) {
+       dbUpdateData.profileImage = body.profileImageUrl;
     } else if (profileImageBase64) {
        try {
            dbUpdateData.profileImage = await uploadBase64Image(profileImageBase64);

@@ -54,11 +54,13 @@ export default function OnboardingPage() {
      formData.append("signature", signData.signature);
      formData.append("folder", signData.folder);
 
+     console.log("[Onboarding] Uploading to Cloudinary...");
      const uploadRes = await fetch(`https://api.cloudinary.com/v1_1/${signData.cloudName}/auto/upload`, {
         method: "POST",
         body: formData
      });
      const uploadData = await uploadRes.json();
+     console.log("[Onboarding] Cloudinary Response:", uploadData);
      if (!uploadRes.ok) throw new Error(uploadData.error?.message || "Cloudinary upload failed");
 
      return uploadData.secure_url;
@@ -75,6 +77,7 @@ export default function OnboardingPage() {
       let profileImageUrl = null;
       if (profileImageFile) {
          profileImageUrl = await uploadFileToCloudinary(profileImageFile);
+         console.log("[Onboarding] Cloudinary URL:", profileImageUrl);
       }
 
       const payload = role === "STUDENT" 

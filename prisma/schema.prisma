@@ -183,6 +183,9 @@ model User {
 }
 
 enum AnnouncementTarget {
+  ALL
+  TEACHERS_ONLY
+  STUDENTS_ONLY
   SPECIFIC_GROUP
   ALL_SUPERVISED
   ALL_ACTIVE
