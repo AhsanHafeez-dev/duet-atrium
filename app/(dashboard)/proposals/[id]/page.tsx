@@ -95,9 +95,19 @@ export default function ProposalReviewPage({ params }: { params: Promise<{ id: s
           </div>
           
           <div className="flex items-center px-4 py-2 bg-surface-container-high rounded-lg border border-outline-variant/10 shrink-0">
-            <div className={`w-2 h-2 rounded-full mr-3 ${proposal.status === "PENDING" ? 'bg-tertiary animate-pulse' : (proposal.status === "ACCEPTED" ? 'bg-primary' : (proposal.status === "REVISION_REQUESTED" ? 'bg-secondary animate-pulse' : 'bg-error'))}`}></div>
-            <span className={`text-sm font-medium ${proposal.status === "PENDING" ? 'text-tertiary' : (proposal.status === "ACCEPTED" ? 'text-primary' : (proposal.status === "REVISION_REQUESTED" ? 'text-secondary' : 'text-error'))}`}>
-               {proposal.status.replace("_", " ")}
+            <div className={`w-2 h-2 rounded-full mr-3 ${
+              proposal.status === "PENDING" ? 'bg-tertiary animate-pulse' : 
+              (proposal.status === "APPROVED_BY_SUPERVISOR" ? 'bg-primary animate-pulse' : 
+              (proposal.status === "ACCEPTED" ? 'bg-primary' : 
+              (proposal.status === "REVISION_REQUESTED" ? 'bg-secondary animate-pulse' : 'bg-error')))
+            }`}></div>
+            <span className={`text-sm font-medium ${
+              proposal.status === "PENDING" ? 'text-tertiary' : 
+              (proposal.status === "APPROVED_BY_SUPERVISOR" ? 'text-primary' : 
+              (proposal.status === "ACCEPTED" ? 'text-primary' : 
+              (proposal.status === "REVISION_REQUESTED" ? 'text-secondary' : 'text-error')))
+            }`}>
+               {proposal.status.replace(/_/g, " ")}
             </span>
           </div>
 

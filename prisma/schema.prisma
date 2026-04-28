@@ -225,6 +225,7 @@ enum NotificationType {
 
 enum ProposalStatus {
   PENDING
+  APPROVED_BY_SUPERVISOR
   ACCEPTED
   REJECTED
   REVISION_REQUESTED

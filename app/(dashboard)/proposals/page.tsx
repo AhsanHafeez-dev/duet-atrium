@@ -59,11 +59,12 @@ export default function ProposalsPage() {
                   <div className="flex justify-between items-start mb-4">
                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                       prop.status === 'ACCEPTED' ? 'bg-primary/10 text-primary border border-primary/20' :
+                      prop.status === 'APPROVED_BY_SUPERVISOR' ? 'bg-primary/10 text-primary border border-primary/20 animate-pulse' :
                       prop.status === 'PENDING' ? 'bg-tertiary/10 text-tertiary border border-tertiary/20' :
                       prop.status === 'REVISION_REQUESTED' ? 'bg-secondary/10 text-secondary border border-secondary/20' :
                       'bg-surface-container-highest text-on-surface-variant'
                     }`}>
-                      {prop.status.replace("_", " ")}
+                      {prop.status.replace(/_/g, " ")}
                     </span>
 
                     <span className="text-[10px] text-on-surface-variant font-mono">{new Date(prop.submittedAt).toLocaleDateString()}</span>

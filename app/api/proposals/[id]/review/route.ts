@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { verifyAccessToken, getServerAuthToken } from "@/lib/auth";
 import { notifyGroup } from "@/lib/notifications";
+import { ProposalStatus } from "@prisma/client";
 
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
@@ -34,8 +35,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     }
 
 
-    let statusUpdate: "PENDING" | "ACCEPTED" | "REJECTED" | "REVISION_REQUESTED" = "PENDING";
-    if (action === "approve") statusUpdate = "ACCEPTED";
+    let statusUpdate: ProposalStatus = "PENDING";
+    if (action === "approve") statusUpdate = "APPROVED_BY_SUPERVISOR";
     if (action === "reject") statusUpdate = "REJECTED";
     if (action === "revise") statusUpdate = "REVISION_REQUESTED";
 
@@ -65,7 +66,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
 
     // Trigger Notifications asynchronously
     let notificationType: any = "PROPOSAL_ACCEPTED";
-    let message = `Your proposal "${proposal.title}" has been APPROVED.`;
+    let message = `Your proposal "${proposal.title}" has been APPROVED by the supervisor. It is now waiting for final Admin approval.`;
     
     if (action === "reject") {
        notificationType = "PROPOSAL_REJECTED";

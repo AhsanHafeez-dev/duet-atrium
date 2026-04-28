@@ -79,16 +79,36 @@ export default function AdminProposalsPage() {
                       <td className="px-6 py-4">
                         <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-widest ${
                           prop.status === 'ACCEPTED' ? 'bg-success/10 text-success border border-success/20' :
+                          prop.status === 'APPROVED_BY_SUPERVISOR' ? 'bg-primary/10 text-primary border border-primary/20 animate-pulse' :
                           prop.status === 'REJECTED' ? 'bg-error/10 text-error border border-error/20' :
                           'bg-secondary/10 text-secondary border border-secondary/20'
                         }`}>
-                          {prop.status}
+                          {prop.status.replace(/_/g, ' ')}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-right">
-                        <Link href={`/proposals/${prop.id}`} className="p-2 inline-flex items-center gap-1 text-xs font-bold text-primary hover:bg-primary/10 rounded-lg transition-all">
-                          View Details
-                        </Link>
+                        <div className="flex items-center justify-end gap-2">
+                           {prop.status === 'APPROVED_BY_SUPERVISOR' && (
+                              <button 
+                                 onClick={async () => {
+                                    if (!confirm("Are you sure you want to finalize this proposal allotment?")) return;
+                                    const token = localStorage.getItem("access_token");
+                                    const res = await fetch(`/api/admin/proposals/${prop.id}/approve`, {
+                                       method: "POST",
+                                       headers: { "Authorization": `Bearer ${token}` }
+                                    });
+                                    if (res.ok) fetchProposals();
+                                    else alert("Failed to approve");
+                                 }}
+                                 className="px-3 py-1 bg-primary text-on-primary text-[10px] font-bold rounded hover:bg-primary-container transition-colors"
+                              >
+                                 Final Approve
+                              </button>
+                           )}
+                           <Link href={`/proposals/${prop.id}`} className="p-2 inline-flex items-center gap-1 text-xs font-bold text-primary hover:bg-primary/10 rounded-lg transition-all">
+                             View
+                           </Link>
+                        </div>
                       </td>
                     </tr>
                   ))
