@@ -25,8 +25,6 @@ export function generateSignedUploadParams(folder: string): {
   const paramsToSign = {
     folder,
     timestamp,
-    allowed_formats: ALLOWED_FORMATS.join(","),
-    max_file_size: MAX_BYTES,
   };
 
   const signature = cloudinary.utils.api_sign_request(
