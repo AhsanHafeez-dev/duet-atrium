@@ -135,6 +135,7 @@ export default function StudentDashboard() {
   // Role-based access control
   const isLeader = userRole === "LEADER";
   const canManageGroup = isLeader; // Only LEADER can invite members, find supervisor, draft proposals
+  const hasApprovedProposal = group?.proposals?.some((p: any) => p.status === "APPROVED_BY_SUPERVISOR");
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -170,16 +171,23 @@ export default function StudentDashboard() {
              {group && userStatus === "ACCEPTED" ? (
                 <>
                    {canManageGroup && (
-                     <Link href="/faculty" className="px-6 py-3 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-container transition-colors shadow-lg shadow-primary/20 flex items-center gap-2 text-sm md:text-base border border-primary/50">
-                       <span className="material-symbols-outlined">person_search</span>
-                       Find Supervisor
-                     </Link>
-                   )}
-                   {canManageGroup && (
-                     <Link href="/proposals/new" className="px-6 py-3 bg-surface-container-highest text-on-surface font-semibold rounded-xl hover:bg-[#3e495d] transition-colors border border-[#424754] flex items-center gap-2 text-sm md:text-base">
-                       <span className="material-symbols-outlined">edit_document</span>
-                       Draft Proposal
-                     </Link>
+                     hasApprovedProposal ? (
+                        <div className="px-5 py-3 bg-primary/10 text-primary border border-primary/20 rounded-xl flex items-center gap-2 text-sm">
+                           <span className="material-symbols-outlined text-[18px] animate-pulse">verified_user</span>
+                           Waiting for Admin Final Approval
+                        </div>
+                     ) : (
+                        <>
+                           <Link href="/faculty" className="px-6 py-3 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-container transition-colors shadow-lg shadow-primary/20 flex items-center gap-2 text-sm md:text-base border border-primary/50">
+                              <span className="material-symbols-outlined">person_search</span>
+                              Find Supervisor
+                           </Link>
+                           <Link href="/proposals/new" className="px-6 py-3 bg-surface-container-highest text-on-surface font-semibold rounded-xl hover:bg-[#3e495d] transition-colors border border-[#424754] flex items-center gap-2 text-sm md:text-base">
+                              <span className="material-symbols-outlined">edit_document</span>
+                              Draft Proposal
+                           </Link>
+                        </>
+                     )
                    )}
                    {!canManageGroup && (
                      <div className="px-5 py-3 bg-surface-container-highest/50 text-on-surface-variant border border-outline/20 rounded-xl flex items-center gap-2 text-sm">
@@ -264,9 +272,12 @@ export default function StudentDashboard() {
                      )}
                    </div>
                  </div>
-                 <div className="bg-tertiary-container/30 text-tertiary px-4 py-2 border border-tertiary/20 rounded-xl max-w-[150px]">
+                 <div className={`${hasApprovedProposal ? 'bg-primary/10 text-primary border-primary/20' : 'bg-tertiary-container/30 text-tertiary border-tertiary/20'} px-4 py-2 border rounded-xl min-w-[150px]`}>
                     <p className="text-xs font-semibold uppercase tracking-wider mb-1">Supervisor</p>
-                    <p className="font-bold text-sm truncate">Not Assigned</p>
+                    <p className="font-bold text-sm truncate">
+                       {group.supervisor ? group.supervisor.email.split('@')[0] : 
+                        (hasApprovedProposal ? "Waiting for Admin..." : "Not Assigned")}
+                    </p>
                  </div>
                </div>
 
@@ -335,11 +346,12 @@ export default function StudentDashboard() {
                            <h4 className="font-bold text-sm text-on-surface truncate pr-4">{prop.title}</h4>
                            <span className={`px-2 py-0.5 rounded text-[9px] font-bold uppercase tracking-tighter ${
                               prop.status === 'ACCEPTED' ? 'bg-primary/10 text-primary border border-primary/20' : 
+                              prop.status === 'APPROVED_BY_SUPERVISOR' ? 'bg-primary/10 text-primary border border-primary/20 animate-pulse' : 
                               prop.status === 'REVISION_REQUESTED' ? 'bg-secondary/10 text-secondary border border-secondary/20 animate-pulse' : 
                               prop.status === 'PENDING' ? 'bg-tertiary/10 text-tertiary border border-tertiary/20' : 
                               'bg-surface-container-highest text-on-surface-variant'
                            }`}>
-                             {prop.status.replace("_", " ")}
+                             {prop.status.replace(/_/g, " ")}
                            </span>
                         </div>
                         

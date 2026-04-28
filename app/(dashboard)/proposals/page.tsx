@@ -27,6 +27,8 @@ export default function ProposalsPage() {
   }, []);
 
   const isLeader = user?.role === "STUDENT" && user?.membership?.role === "LEADER";
+  const hasApprovedProposal = proposals.some(p => p.status === "APPROVED_BY_SUPERVISOR");
+  const canSubmitNew = isLeader && !hasApprovedProposal;
 
   return (
     <AuthGuard>
@@ -36,12 +38,12 @@ export default function ProposalsPage() {
             <h1 className="text-3xl font-bold">Proposals</h1>
             <p className="text-on-surface-variant">Manage and track project proposals.</p>
           </div>
-          {isLeader && (
-            <Link href="/proposals/new" className="px-6 py-2 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-container transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
-              <span className="material-symbols-outlined">add</span>
-              New Proposal
-            </Link>
-          )}
+          {canSubmitNew && (
+          <Link href="/proposals/new" className="px-6 py-2 bg-primary text-on-primary rounded-xl font-bold hover:brightness-110 transition-all flex items-center gap-2 shadow-lg shadow-primary/20">
+            <span className="material-symbols-outlined">add</span>
+            New Proposal
+          </Link>
+        )}
         </div>
 
         {loading ? (

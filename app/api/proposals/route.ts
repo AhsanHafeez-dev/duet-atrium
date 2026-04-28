@@ -59,10 +59,16 @@ export async function POST(req: Request) {
     });
 
     if (!membership || membership.role !== "LEADER") {
-       return NextResponse.json({ error: "Only the Group Leader can submit proposals." }, { status: 403 });
+       return NextResponse.json({ error: "Only the Group Leader can submit a proposal." }, { status: 403 });
     }
 
     const group = membership.group;
+
+    // Restriction: cannot submit if one is already APPROVED_BY_SUPERVISOR
+    const hasApproved = group.proposals.some((p: any) => p.status === "APPROVED_BY_SUPERVISOR");
+    if (hasApproved) {
+       return NextResponse.json({ error: "Your group already has a proposal waiting for Admin approval. Please wait for the final decision." }, { status: 400 });
+    }
 
     // Check concurrent pending proposals
     const pendingCount = group.proposals.filter((p: any) => p.status === "PENDING").length;
