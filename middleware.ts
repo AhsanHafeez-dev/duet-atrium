@@ -26,6 +26,8 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // ── 1. Auth guard for protected page routes ──────────────
+  // Disabling cookie-based auth check to allow localStorage-based auth handled by client-side AuthGuard
+  /*
   const isProtectedPage = PROTECTED_PATHS.some((p) => pathname.startsWith(p));
   if (isProtectedPage) {
     const token = req.cookies.get("access_token")?.value;
@@ -43,6 +45,7 @@ export async function middleware(req: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
   }
+  */
 
   // ── 2. Portal lock guard for write API calls ─────────
   if (
