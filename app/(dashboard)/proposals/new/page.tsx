@@ -404,6 +404,18 @@ export default function SubmitProposal() {
                     />
                     <span className="material-symbols-outlined text-3xl mb-2 text-primary/70">schema</span>
                     <p className="text-sm font-semibold text-on-surface">{diagramName || (existingDiagramUrl ? "Diagram already uploaded" : "Click to browse or drag an image")}</p>
+                    {existingDiagramUrl && !diagramName && (
+                       <a 
+                          href={existingDiagramUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          onClick={(e) => e.stopPropagation()}
+                          className="mt-2 text-xs text-primary hover:underline flex items-center justify-center gap-1 relative z-10"
+                       >
+                          <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                          View current diagram
+                       </a>
+                    )}
                     <p className="text-xs text-on-surface-variant mt-1">Image must be under 4MB</p>
                  </div>
               </div>
@@ -420,6 +432,18 @@ export default function SubmitProposal() {
                     />
                     <span className="material-symbols-outlined text-3xl mb-2 text-tertiary/70">slideshow</span>
                     <p className="text-sm font-semibold text-on-surface">{presentationName || (existingPresentationUrl ? "Presentation already uploaded" : "Click to browse or drag a .pptx file")}</p>
+                    {existingPresentationUrl && !presentationName && (
+                       <a 
+                          href={existingPresentationUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          onClick={(e) => e.stopPropagation()}
+                          className="mt-2 text-xs text-tertiary hover:underline flex items-center justify-center gap-1 relative z-10"
+                       >
+                          <span className="material-symbols-outlined text-[14px]">open_in_new</span>
+                          View current presentation
+                       </a>
+                    )}
                     <p className="text-xs text-on-surface-variant mt-1">PPTX file must be under 4MB</p>
                  </div>
               </div>
