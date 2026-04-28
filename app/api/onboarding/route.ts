@@ -17,8 +17,9 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    console.log("[Onboarding API] Payload received:", body);
-    const { password, profileImageUrl, profileImageBase64 } = body;
+    console.log("[Onboarding API] Full Body:", JSON.stringify(body, null, 2));
+    
+    const { password, profileImageUrl, profileImageBase64, rollNumber, batch, program, designation, domainTags, bio } = body;
 
     if (!password || password.length < 6) {
        return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
@@ -26,39 +27,45 @@ export async function POST(req: Request) {
 
     const passwordHash = await bcrypt.hash(password, 10);
     
-    let dbUpdateData: any = {
+    const updateData: any = {
       passwordHash,
       isOnboarded: true
     };
 
-    if (body.hasOwnProperty('profileImageUrl') && body.profileImageUrl !== undefined) {
-       dbUpdateData.profileImage = body.profileImageUrl;
+    // Explicitly set profileImage if it's in the body (even if null to allow clearing)
+    if (body.hasOwnProperty('profileImageUrl')) {
+       updateData.profileImage = profileImageUrl;
     } else if (profileImageBase64) {
        try {
-           dbUpdateData.profileImage = await uploadBase64Image(profileImageBase64);
+           updateData.profileImage = await uploadBase64Image(profileImageBase64);
        } catch (e) {
            console.error("[Image Upload Failed]", e);
        }
     }
 
     if (payload.role === "STUDENT") {
-        const { rollNumber, batch, program } = body;
         if (!rollNumber || !batch || !program) {
             return NextResponse.json({ error: "All student fields are required" }, { status: 400 });
         }
-        dbUpdateData = { ...dbUpdateData, rollNumber, batch, program };
+        Object.assign(updateData, { rollNumber, batch, program });
     } else if (payload.role === "TEACHER") {
-        const { designation, domainTags, bio } = body;
         if (!designation) {
             return NextResponse.json({ error: "Designation is required" }, { status: 400 });
         }
-        dbUpdateData = { ...dbUpdateData, designation, bio, domainTags: domainTags || [] };
+        Object.assign(updateData, { designation, bio, domainTags: domainTags || [] });
     }
 
-    await prisma.user.update({
+    console.log("[Onboarding API] Final Update Data:", JSON.stringify(updateData, null, 2));
+
+    const updatedUser = await prisma.user.update({
       where: { id: payload.userId },
-      data: dbUpdateData
+      data: updateData
     });
+
+    console.log("[Onboarding API] User Updated successfully. DB State:", JSON.stringify({
+       email: updatedUser.email,
+       profileImage: updatedUser.profileImage
+    }, null, 2));
 
     return NextResponse.json({ success: true, redirect: "/dashboard" });
 
