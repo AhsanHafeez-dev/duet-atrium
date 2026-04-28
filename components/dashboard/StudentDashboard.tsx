@@ -146,7 +146,11 @@ export default function StudentDashboard() {
 
         <div className="relative z-10 max-w-2xl text-left">
           <div className="flex items-center gap-3 mb-4">
-             {group && userStatus === "ACCEPTED" ? (
+             {group?.supervisor ? (
+                <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full border border-primary/20 uppercase tracking-widest">
+                   Phase 3: Project Development
+                </span>
+             ) : (group && userStatus === "ACCEPTED" ? (
                 <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full border border-primary/20 uppercase tracking-widest">
                    Phase 2: Proposal Drafting
                 </span>
@@ -154,16 +158,18 @@ export default function StudentDashboard() {
                 <span className="px-3 py-1 bg-surface-variant text-on-surface-variant text-xs font-semibold rounded-full border border-[#3e495d] uppercase tracking-widest">
                    Phase 1: Group Formation
                 </span>
-             )}
+             ))}
           </div>
           <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-on-surface mb-4 leading-tight">
             Welcome back, <span className="text-primary">{user?.email?.split('@')[0] || "Student"}</span>.
           </h1>
           <p className="text-on-surface-variant text-base md:text-lg mb-8 leading-relaxed">
             {group && userStatus === "ACCEPTED"
-              ? canManageGroup
-                ? "Browse the faculty directory to find a supervisor and submit your project proposal."
-                : `You are a member of ${group.id}. The group leader manages proposals and invitations.`
+              ? group.supervisor
+                ? "Your supervisor has been assigned. You can now proceed with your project development and documentation."
+                : canManageGroup
+                  ? "Browse the faculty directory to find a supervisor and submit your project proposal."
+                  : `You are a member of ${group.id}. The group leader manages proposals and invitations.`
               : "You do not have a group yet. Create one or wait for an invitation."}
           </p>
 
@@ -171,7 +177,12 @@ export default function StudentDashboard() {
              {group && userStatus === "ACCEPTED" ? (
                 <>
                    {canManageGroup && (
-                     hasApprovedProposal ? (
+                     group.supervisor ? (
+                        <div className="px-5 py-3 bg-primary/10 text-primary border border-primary/20 rounded-xl flex items-center gap-2 text-sm font-bold">
+                           <span className="material-symbols-outlined text-[18px]">verified</span>
+                           Supervisor Allotted
+                        </div>
+                     ) : hasApprovedProposal ? (
                         <div className="px-5 py-3 bg-primary/10 text-primary border border-primary/20 rounded-xl flex items-center gap-2 text-sm">
                            <span className="material-symbols-outlined text-[18px] animate-pulse">verified_user</span>
                            Waiting for Admin Final Approval
@@ -384,13 +395,13 @@ export default function StudentDashboard() {
                  <span className="material-symbols-outlined text-tertiary">check_circle</span>
                  Milestone Checklist
                </h2>
-               <div className="space-y-4">
-                 {[
-                   { task: "Create or join a group", done: true },
-                   { task: "Identify primary research domain", done: false },
-                   { task: "Find and finalize supervisor", done: false },
-                   { task: "Submit official proposal abstract", done: false },
-                 ].map((item, i) => (
+                 <div className="space-y-4">
+                  {[
+                    { task: "Create or join a group", done: !!group },
+                    { task: "Identify primary research domain", done: group?.proposals?.length > 0 },
+                    { task: "Find and finalize supervisor", done: !!group?.supervisor },
+                    { task: "Submit official proposal abstract", done: group?.proposals?.some((p: any) => p.status === 'ACCEPTED') },
+                  ].map((item, i) => (
                    <div key={i} className="flex gap-3">
                      <div className="mt-0.5">
                         {item.done ? (
