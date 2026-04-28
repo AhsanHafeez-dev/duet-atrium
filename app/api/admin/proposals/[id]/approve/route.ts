@@ -30,14 +30,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
         data: { status: "ACCEPTED" }
       });
 
-      // 2. Reject other pending proposals for this group (if any remained)
-      await tx.proposal.updateMany({
+      // 2. Delete other proposals for this group (as they are no longer needed)
+      await tx.proposal.deleteMany({
         where: {
           groupId: proposal.groupId,
-          id: { not: id },
-          status: { in: ["PENDING", "APPROVED_BY_SUPERVISOR"] }
-        },
-        data: { status: "REJECTED" }
+          id: { not: id }
+        }
       });
 
       // 3. Update group status to ACTIVE if needed

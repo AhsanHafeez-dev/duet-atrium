@@ -27,7 +27,7 @@ export default function ProposalsPage() {
   }, []);
 
   const isLeader = user?.role === "STUDENT" && user?.membership?.role === "LEADER";
-  const hasApprovedProposal = proposals.some(p => p.status === "APPROVED_BY_SUPERVISOR");
+  const hasApprovedProposal = proposals.some(p => p.status === "APPROVED_BY_SUPERVISOR" || p.status === "ACCEPTED");
   const canSubmitNew = isLeader && !hasApprovedProposal;
 
   return (
