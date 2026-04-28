@@ -135,7 +135,10 @@ export default function StudentDashboard() {
   // Role-based access control
   const isLeader = userRole === "LEADER";
   const canManageGroup = isLeader; // Only LEADER can invite members, find supervisor, draft proposals
+  
   const hasApprovedProposal = group?.proposals?.some((p: any) => p.status === "APPROVED_BY_SUPERVISOR");
+  const acceptedProposal = group?.proposals?.find((p: any) => p.status === "ACCEPTED");
+  const assignedSupervisor = acceptedProposal?.teacher;
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -146,7 +149,7 @@ export default function StudentDashboard() {
 
         <div className="relative z-10 max-w-2xl text-left">
           <div className="flex items-center gap-3 mb-4">
-             {group?.supervisor ? (
+             {assignedSupervisor ? (
                 <span className="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full border border-primary/20 uppercase tracking-widest">
                    Phase 3: Project Development
                 </span>
@@ -165,7 +168,7 @@ export default function StudentDashboard() {
           </h1>
           <p className="text-on-surface-variant text-base md:text-lg mb-8 leading-relaxed">
             {group && userStatus === "ACCEPTED"
-              ? group.supervisor
+              ? assignedSupervisor
                 ? "Your supervisor has been assigned. You can now proceed with your project development and documentation."
                 : canManageGroup
                   ? "Browse the faculty directory to find a supervisor and submit your project proposal."
@@ -177,7 +180,7 @@ export default function StudentDashboard() {
              {group && userStatus === "ACCEPTED" ? (
                 <>
                    {canManageGroup && (
-                     group.supervisor ? (
+                     assignedSupervisor ? (
                         <div className="px-5 py-3 bg-primary/10 text-primary border border-primary/20 rounded-xl flex items-center gap-2 text-sm font-bold">
                            <span className="material-symbols-outlined text-[18px]">verified</span>
                            Supervisor Allotted
@@ -283,10 +286,10 @@ export default function StudentDashboard() {
                      )}
                    </div>
                  </div>
-                 <div className={`${hasApprovedProposal ? 'bg-primary/10 text-primary border-primary/20' : 'bg-tertiary-container/30 text-tertiary border-tertiary/20'} px-4 py-2 border rounded-xl min-w-[150px]`}>
+                 <div className={`${assignedSupervisor ? 'bg-primary/10 text-primary border-primary/20' : hasApprovedProposal ? 'bg-primary/10 text-primary border-primary/20 animate-pulse' : 'bg-tertiary-container/30 text-tertiary border-tertiary/20'} px-4 py-2 border rounded-xl min-w-[150px]`}>
                     <p className="text-xs font-semibold uppercase tracking-wider mb-1">Supervisor</p>
                     <p className="font-bold text-sm truncate">
-                       {group.supervisor ? group.supervisor.email.split('@')[0] : 
+                       {assignedSupervisor ? assignedSupervisor.email.split('@')[0] : 
                         (hasApprovedProposal ? "Waiting for Admin..." : "Not Assigned")}
                     </p>
                  </div>
@@ -399,8 +402,8 @@ export default function StudentDashboard() {
                   {[
                     { task: "Create or join a group", done: !!group },
                     { task: "Identify primary research domain", done: group?.proposals?.length > 0 },
-                    { task: "Find and finalize supervisor", done: !!group?.supervisor },
-                    { task: "Submit official proposal abstract", done: group?.proposals?.some((p: any) => p.status === 'ACCEPTED') },
+                    { task: "Find and finalize supervisor", done: !!assignedSupervisor },
+                    { task: "Submit official proposal abstract", done: !!acceptedProposal },
                   ].map((item, i) => (
                    <div key={i} className="flex gap-3">
                      <div className="mt-0.5">

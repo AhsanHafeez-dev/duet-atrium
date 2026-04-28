@@ -23,7 +23,7 @@ export async function GET(req: Request) {
                  where: { status: "PENDING" },
                  include: { invitee: true }
                },
-               proposals: true
+               proposals: { include: { teacher: true } }
             }
          }
       }
