@@ -30,6 +30,18 @@ export async function GET(req: Request) {
       return NextResponse.json({ success: true, proposals });
     }
 
+    if (payload.role === "ADMIN") {
+      const proposals = await prisma.proposal.findMany({
+        include: { 
+          teacher: { select: { email: true, designation: true } },
+          group: true,
+          submittedBy: { select: { email: true } }
+        },
+        orderBy: { submittedAt: "desc" }
+      });
+      return NextResponse.json({ success: true, proposals });
+    }
+
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   } catch (error) {
