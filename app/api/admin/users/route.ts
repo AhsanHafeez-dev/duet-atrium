@@ -36,6 +36,7 @@ export async function GET(req: Request) {
         rollNumber: true,
         designation: true,
         program: true,
+        profileImage: true,
         createdAt: true,
       },
       orderBy: { createdAt: "desc" }

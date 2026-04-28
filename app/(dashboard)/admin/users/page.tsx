@@ -127,8 +127,12 @@ export default function AdminUsersPage() {
                     <tr key={user.id} className="hover:bg-surface-container-highest/30 transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-outline/10 flex items-center justify-center font-bold text-primary">
-                            {user.email.charAt(0).toUpperCase()}
+                          <div className="w-10 h-10 rounded-xl bg-surface-container-highest border border-outline/10 flex items-center justify-center font-bold text-primary overflow-hidden">
+                            {user.profileImage ? (
+                               <img src={user.profileImage} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                               user.email.charAt(0).toUpperCase()
+                            )}
                           </div>
                           <div>
                             <p className="text-sm font-bold text-on-surface">{user.email}</p>
