@@ -51,6 +51,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
              studentId: payload.userId,
              role: "MEMBER"
           }
+       }),
+       // Automatically reject all other pending invitations for this user
+       prisma.groupInvitation.updateMany({
+          where: {
+             inviteeId: payload.userId,
+             id: { not: inviteId },
+             status: "PENDING"
+          },
+          data: { status: "REJECTED" }
        })
     ]);
 
