@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { password, profileImageBase64 } = body;
+    const { password, profileImageUrl, profileImageBase64 } = body;
 
     if (!password || password.length < 6) {
        return NextResponse.json({ error: "Password must be at least 6 characters" }, { status: 400 });
@@ -30,12 +30,13 @@ export async function POST(req: Request) {
       isOnboarded: true
     };
 
-    if (profileImageBase64) {
+    if (profileImageUrl) {
+       dbUpdateData.profileImage = profileImageUrl;
+    } else if (profileImageBase64) {
        try {
            dbUpdateData.profileImage = await uploadBase64Image(profileImageBase64);
        } catch (e) {
            console.error("[Image Upload Failed]", e);
-           // We can proceed without the image or throw an error. Let's proceed.
        }
     }
 

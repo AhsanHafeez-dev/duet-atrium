@@ -21,8 +21,8 @@ model Announcement {
 }
 
 model Document {
-  id           String         @id @default(cuid())
-  groupId      String
+  id           String          @id @default(cuid())
+  groupId      String?
   proposalId   String?
   uploaderId   String
   filename     String
@@ -30,16 +30,21 @@ model Document {
   url          String
   fileType     String
   fileSize     Int
-  version      Int            @default(1)
-  status       DocumentStatus @default(PENDING_REVIEW)
+  version      Int             @default(1)
+  status       DocumentStatus  @default(PENDING_REVIEW)
+  targetType   DocumentTarget  @default(GROUP_SPECIFIC)
+  targetGroupId String?
   reviewedById String?
   reviewedAt   DateTime?
-  createdAt    DateTime       @default(now())
-  group        Group          @relation(fields: [groupId], references: [id])
-  proposal     Proposal?      @relation(fields: [proposalId], references: [id])
-  uploader     User           @relation(fields: [uploaderId], references: [id])
+  createdAt    DateTime        @default(now())
+  
+  group        Group?          @relation(fields: [groupId], references: [id])
+  targetGroup  Group?          @relation("DocumentTargetGroup", fields: [targetGroupId], references: [id])
+  proposal     Proposal?       @relation(fields: [proposalId], references: [id])
+  uploader     User            @relation(fields: [uploaderId], references: [id])
 
   @@index([groupId])
+  @@index([targetType])
 }
 
 model Group {
@@ -57,6 +62,7 @@ model Group {
   invitations  GroupInvitation[]
   members      GroupMember[]
   proposals    Proposal[]
+  targetDocs   Document[]        @relation("DocumentTargetGroup")
 }
 
 model GroupInvitation {
@@ -186,6 +192,14 @@ enum DocumentStatus {
   PENDING_REVIEW
   REVIEWED
   NEEDS_REVISION
+}
+
+enum DocumentTarget {
+  ALL
+  TEACHERS_ONLY
+  STUDENTS_ONLY
+  SUPERVISED_ONLY
+  GROUP_SPECIFIC
 }
 
 enum GroupStatus {

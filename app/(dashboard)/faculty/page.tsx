@@ -1,15 +1,23 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import AuthGuard from "@/components/auth/AuthGuard";
 
-export default function FacultyDirectory() {
+function FacultyDirectoryContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+  
   const [faculty, setFaculty] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterDept, setFilterDept] = useState("All");
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
+
+  useEffect(() => {
+     setSearchQuery(searchParams.get("search") || "");
+  }, [searchParams]);
 
   useEffect(() => {
      const token = localStorage.getItem("access_token");
@@ -29,19 +37,31 @@ export default function FacultyDirectory() {
        });
   }, []);
 
-  const departments = ["All", "Computer Science", "Software Engineering", "Information Tech"];
+  const departments = ["All", "Computer Science", "Cyber Security", "Artificial Intelligence", "Data Science", "Information Tech"];
 
   const filteredFaculty = faculty.filter(f => {
-     if (filterDept === "All") return true;
+     // 1. Department Filter
+     let deptMatch = true;
+     if (filterDept !== "All") {
+        const charCode = f.email.charCodeAt(7) || 0;
+        if (filterDept === "Computer Science") deptMatch = charCode % 5 === 0;
+        else if (filterDept === "Cyber Security") deptMatch = charCode % 5 === 1;
+        else if (filterDept === "Artificial Intelligence") deptMatch = charCode % 5 === 2;
+        else if (filterDept === "Data Science") deptMatch = charCode % 5 === 3;
+        else if (filterDept === "Information Tech") deptMatch = charCode % 5 === 4;
+     }
+
+     // 2. Search Query Filter
+     let searchMatch = true;
+     if (searchQuery) {
+        const q = searchQuery.toLowerCase();
+        searchMatch = 
+           f.email.toLowerCase().includes(q) || 
+           (f.designation && f.designation.toLowerCase().includes(q)) ||
+           (f.domainTags && f.domainTags.some((t: string) => t.toLowerCase().includes(q)));
+     }
      
-     // Stable mock mapping since 'department' isn't explicitly on the teacher schema
-     const charCode = f.email.charCodeAt(7) || 0; // 'teacherX' -> charCode of X
-     
-     if (filterDept === "Computer Science") return charCode % 3 === 0;
-     if (filterDept === "Software Engineering") return charCode % 3 === 1;
-     if (filterDept === "Information Tech") return charCode % 3 === 2;
-     
-     return true; 
+     return deptMatch && searchMatch;
   });
 
   if (loading) {
@@ -132,5 +152,13 @@ export default function FacultyDirectory() {
         </div>
       </div>
     </AuthGuard>
+  );
+}
+
+export default function FacultyDirectory() {
+  return (
+    <Suspense fallback={<div className="p-10 text-center"><span className="material-symbols-outlined animate-spin text-3xl">progress_activity</span></div>}>
+      <FacultyDirectoryContent />
+    </Suspense>
   );
 }

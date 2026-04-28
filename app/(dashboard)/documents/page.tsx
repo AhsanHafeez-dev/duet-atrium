@@ -13,7 +13,10 @@ export default function DocumentRepository() {
 
   const [isUploading, setIsUploading] = useState(false);
   const [uploadTitle, setUploadTitle] = useState("");
-  const [documentType, setDocumentType] = useState("MID_TERM_REPORT");
+  const [documentType, setDocumentType] = useState("OTHER");
+  const [targetType, setTargetType] = useState("ALL");
+  const [targetGroupId, setTargetGroupId] = useState("");
+  const [groups, setGroups] = useState<any[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -37,7 +40,14 @@ export default function DocumentRepository() {
      const headers = { "Authorization": `Bearer ${token}` };
 
      fetch("/api/auth/me", { headers }).then(r => r.json()).then(d => {
-         if(d.user) setUser(d.user);
+         if(d.user) {
+            setUser(d.user);
+            if (d.user.role === "TEACHER") {
+               fetch("/api/teacher/groups", { headers }).then(r => r.json()).then(gd => {
+                  if (gd.success) setGroups(gd.groups);
+               });
+            }
+         }
      });
      fetchDocs();
   }, []);
@@ -100,7 +110,9 @@ export default function DocumentRepository() {
             body: JSON.stringify({
                title: uploadTitle,
                documentType,
-               fileUrl: finalUrl
+               fileUrl: finalUrl,
+               targetType: user.role === "STUDENT" ? "GROUP_SPECIFIC" : targetType,
+               targetGroupId: targetType === "GROUP_SPECIFIC" ? targetGroupId : null
             })
          });
          const data = await res.json();
@@ -139,14 +151,14 @@ export default function DocumentRepository() {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
           <div className="xl:col-span-8 space-y-8">
               
-            {user?.role === "STUDENT" && (
+            {user && (user.role === "STUDENT" || user.role === "ADMIN" || user.role === "TEACHER") && (
                 <div className="bg-surface-container-low rounded-xl p-6 border border-outline-variant/10 group mb-10">
                    <h2 className="text-xl font-semibold flex items-center gap-2 mb-4 text-primary">
                       <span className="material-symbols-outlined text-[22px]">upload_file</span>
-                      Submit Artifact
+                      {user.role === "ADMIN" ? "Broadcast Document" : user.role === "TEACHER" ? "Distribute Materials" : "Submit Artifact"}
                    </h2>
                    <form onSubmit={handleUploadSubmit} className="space-y-4">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                          <input 
                              type="text" 
                              placeholder="Document Title" 
@@ -155,18 +167,55 @@ export default function DocumentRepository() {
                              onChange={e => setUploadTitle(e.target.value)}
                              className="w-full bg-surface-container-highest border-transparent border-b-2 focus:border-b-primary text-on-surface rounded-t-md px-4 py-3 text-sm placeholder:text-outline/70 focus:ring-0" 
                          />
-                         <select 
-                             value={documentType}
-                             onChange={e => setDocumentType(e.target.value)}
-                             className="w-full bg-surface-container-highest border-transparent border-b-2 focus:border-b-primary text-on-surface rounded-t-md px-4 py-3 text-sm focus:ring-0 appearance-none"
-                         >
-                             <option value="MID_TERM_REPORT">Mid-Term Report</option>
-                             <option value="FINAL_REPORT">Final Report</option>
-                             <option value="OTHER">Other / Misc</option>
-                         </select>
+                         
+                         {user.role === "ADMIN" ? (
+                            <select 
+                               value={targetType}
+                               onChange={e => setTargetType(e.target.value)}
+                               className="w-full bg-surface-container-highest border-transparent border-b-2 focus:border-b-primary text-on-surface rounded-t-md px-4 py-3 text-sm focus:ring-0 appearance-none"
+                            >
+                               <option value="ALL">Everyone</option>
+                               <option value="TEACHERS_ONLY">Teachers Only</option>
+                               <option value="STUDENTS_ONLY">Students Only</option>
+                            </select>
+                         ) : user.role === "TEACHER" ? (
+                            <select 
+                               value={targetType}
+                               onChange={e => setTargetType(e.target.value)}
+                               className="w-full bg-surface-container-highest border-transparent border-b-2 focus:border-b-primary text-on-surface rounded-t-md px-4 py-3 text-sm focus:ring-0 appearance-none"
+                            >
+                               <option value="SUPERVISED_ONLY">All My Supervised Groups</option>
+                               <option value="GROUP_SPECIFIC">Specific Group</option>
+                            </select>
+                         ) : (
+                            <select 
+                               value={documentType}
+                               onChange={e => setDocumentType(e.target.value)}
+                               className="w-full bg-surface-container-highest border-transparent border-b-2 focus:border-b-primary text-on-surface rounded-t-md px-4 py-3 text-sm focus:ring-0 appearance-none"
+                            >
+                               <option value="MID_TERM_REPORT">Mid-Term Report</option>
+                               <option value="FINAL_REPORT">Final Report</option>
+                               <option value="OTHER">Other / Misc</option>
+                            </select>
+                         )}
+
+                         {user.role === "TEACHER" && targetType === "GROUP_SPECIFIC" && (
+                            <select 
+                               value={targetGroupId}
+                               onChange={e => setTargetGroupId(e.target.value)}
+                               required
+                               className="w-full bg-surface-container-highest border-transparent border-b-2 focus:border-b-primary text-on-surface rounded-t-md px-4 py-3 text-sm focus:ring-0 appearance-none"
+                            >
+                               <option value="">Select Group...</option>
+                               {groups.map(g => (
+                                  <option key={g.id} value={g.id}>{g.id} ({g.proposals[0]?.title.substring(0, 20)}...)</option>
+                               ))}
+                            </select>
+                         )}
                       </div>
+                      
                       <div className="flex flex-col gap-2">
-                         <label className="text-xs text-on-surface-variant ml-1 font-medium">Select File (PDF, DOCX, ZIP etc.)</label>
+                         <label className="text-xs text-on-surface-variant ml-1 font-medium">Select File</label>
                          <div className="flex items-center gap-4 p-4 border-2 border-dashed border-[#3e495d] rounded-xl bg-surface-container-highest/50">
                             <input 
                                 type="file" 
@@ -177,7 +226,7 @@ export default function DocumentRepository() {
                          </div>
                       </div>
                       <button type="submit" disabled={isUploading} className="px-6 py-2 bg-gradient-to-r from-primary to-primary-container text-on-primary font-semibold rounded-md hover:brightness-110 disabled:opacity-50">
-                          {isUploading ? "Uploading..." : "Upload Document"}
+                          {isUploading ? "Uploading..." : "Publish Document"}
                       </button>
                    </form>
                 </div>
@@ -214,7 +263,9 @@ export default function DocumentRepository() {
                   </div>
                   <div className="flex items-center gap-4 text-xs text-on-surface-variant mt-2">
                     <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">schedule</span> {new Date(doc.createdAt).toLocaleDateString()}</span>
-                    <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[14px]">label</span> {doc.documentType.replace(/_/g, " ")}</span>
+                    <span className="flex items-center gap-1 px-2 py-0.5 bg-surface-container rounded uppercase tracking-tighter font-bold text-[9px] border border-outline-variant/10">
+                       {doc.targetType?.replace(/_/g, " ")}
+                    </span>
                   </div>
                 </div>
               </div>

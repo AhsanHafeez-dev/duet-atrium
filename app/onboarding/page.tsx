@@ -191,7 +191,9 @@ export default function OnboardingPage() {
                          >
                             <option>BSCS</option>
                             <option>BSIT</option>
-                            <option>BSSE</option>
+                            <option>BSCY</option>
+                            <option>BSAI</option>
+                            <option>BSDS</option>
                          </select>
                       </div>
                    </div>
