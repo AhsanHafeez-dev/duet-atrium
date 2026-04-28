@@ -46,7 +46,7 @@ export async function POST(req: Request) {
     const payload = verifyAccessToken(token);
     if (!payload || payload.role !== "STUDENT") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { title, abstract, problemStatement, proposedStack, researchPapers, teacherId, diagramBase64, presentationBase64 } = await req.json();
+    const { title, abstract, problemStatement, proposedStack, researchPapers, teacherId, diagramBase64, presentationBase64, diagramUrl: bodyDiagramUrl, presentationUrl: bodyPresentationUrl } = await req.json();
 
     if (!title || !abstract || !problemStatement || !teacherId) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -99,9 +99,14 @@ export async function POST(req: Request) {
 
     if (diagramBase64) {
        diagramUrl = await uploadBase64Image(diagramBase64, "proposals_diagrams");
+    } else if (bodyDiagramUrl) {
+       diagramUrl = bodyDiagramUrl;
     }
+
     if (presentationBase64) {
        presentationUrl = await uploadBase64Document(presentationBase64, "proposals_presentations");
+    } else if (bodyPresentationUrl) {
+       presentationUrl = bodyPresentationUrl;
     }
 
     const proposal = await prisma.proposal.create({
