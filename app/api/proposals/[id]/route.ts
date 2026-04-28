@@ -74,8 +74,8 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
 
     // Validate ownership
     const membership = proposal.group.members.find(m => m.studentId === payload.userId);
-    if (!membership || (membership.role !== "LEADER" && membership.role !== "CO_LEADER")) {
-       return NextResponse.json({ error: "Only the Group Leader or Co-Leader can resubmit the proposal." }, { status: 403 });
+    if (!membership || membership.role !== "LEADER") {
+       return NextResponse.json({ error: "Only the Group Leader can resubmit the proposal." }, { status: 403 });
     }
 
     if (proposal.status !== "REVISION_REQUESTED" && proposal.status !== "PENDING") {

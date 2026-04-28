@@ -25,6 +25,12 @@ export async function GET(req: Request) {
          batch: true,
          program: true,
          designation: true,
+         membership: {
+           select: {
+             role: true,
+             groupId: true
+           }
+         }
       }
     });
 

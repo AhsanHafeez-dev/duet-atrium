@@ -214,7 +214,7 @@ export default function ProposalReviewPage({ params }: { params: Promise<{ id: s
                     </h3>
                     <p className="text-sm text-on-surface-variant whitespace-pre-wrap">{proposal.rejectionComment}</p>
                     
-                    {((proposal.status === "REVISION_REQUESTED") || (proposal.status === "PENDING" && proposal.rejectionComment)) && !isTeacher && (
+                    {((proposal.status === "REVISION_REQUESTED") || (proposal.status === "PENDING" && proposal.rejectionComment)) && !isTeacher && user?.membership?.role === "LEADER" && (
                        <div className="mt-8 space-y-4">
                           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 flex items-start gap-3">
                              <span className="material-symbols-outlined text-primary">info</span>

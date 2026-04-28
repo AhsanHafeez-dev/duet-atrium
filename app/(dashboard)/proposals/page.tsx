@@ -6,29 +6,27 @@ import Link from "next/link";
 
 export default function ProposalsPage() {
   const [proposals, setProposals] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
-    const userRole = localStorage.getItem("user_role");
-    setRole(userRole);
-    
     const token = localStorage.getItem("access_token");
-    fetch("/api/proposals", {
-      headers: { "Authorization": `Bearer ${token}` }
-    })
-      .then(r => r.json())
-      .then(res => {
-        if (res.success) {
-          setProposals(res.proposals);
-        }
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error(err);
-        setLoading(false);
-      });
+    const headers = { "Authorization": `Bearer ${token}` };
+    
+    Promise.all([
+      fetch("/api/auth/me", { headers }).then(r => r.json()),
+      fetch("/api/proposals", { headers }).then(r => r.json())
+    ]).then(([uData, pData]) => {
+      if (uData.success) setUser(uData.user);
+      if (pData.success) setProposals(pData.proposals);
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
   }, []);
+
+  const isLeader = user?.role === "STUDENT" && user?.membership?.role === "LEADER";
 
   return (
     <AuthGuard>
@@ -38,7 +36,7 @@ export default function ProposalsPage() {
             <h1 className="text-3xl font-bold">Proposals</h1>
             <p className="text-on-surface-variant">Manage and track project proposals.</p>
           </div>
-          {role === "STUDENT" && (
+          {isLeader && (
             <Link href="/proposals/new" className="px-6 py-2 bg-primary text-on-primary font-bold rounded-xl hover:bg-primary-container transition-colors shadow-lg shadow-primary/20 flex items-center gap-2">
               <span className="material-symbols-outlined">add</span>
               New Proposal
@@ -74,10 +72,10 @@ export default function ProposalsPage() {
                   <div className="mt-4 pt-4 border-t border-[#2d3449] flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-surface-container-highest flex items-center justify-center text-[10px] font-bold">
-                        {role === "STUDENT" ? prop.teacher?.email?.[0]?.toUpperCase() : prop.submittedBy?.email?.[0]?.toUpperCase()}
+                        {user?.role === "STUDENT" ? prop.teacher?.email?.[0]?.toUpperCase() : prop.submittedBy?.email?.[0]?.toUpperCase()}
                       </div>
                       <span className="text-xs text-on-surface-variant truncate max-w-[120px]">
-                        {role === "STUDENT" ? prop.teacher?.email?.split('@')[0] : prop.submittedBy?.email?.split('@')[0]}
+                        {user?.role === "STUDENT" ? prop.teacher?.email?.split('@')[0] : prop.submittedBy?.email?.split('@')[0]}
                       </span>
                     </div>
                     <span className="material-symbols-outlined text-sm text-primary opacity-0 group-hover:opacity-100 transition-opacity">arrow_forward</span>

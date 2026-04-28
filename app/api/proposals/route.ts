@@ -58,8 +58,8 @@ export async function POST(req: Request) {
        include: { group: { include: { proposals: true } } }
     });
 
-    if (!membership || (membership.role !== "LEADER" && membership.role !== "CO_LEADER")) {
-       return NextResponse.json({ error: "Only the Group Leader or Co-Leader can submit proposals." }, { status: 403 });
+    if (!membership || membership.role !== "LEADER") {
+       return NextResponse.json({ error: "Only the Group Leader can submit proposals." }, { status: 403 });
     }
 
     const group = membership.group;

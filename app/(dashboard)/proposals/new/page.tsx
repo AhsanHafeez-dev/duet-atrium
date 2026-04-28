@@ -14,6 +14,7 @@ export default function SubmitProposal() {
   const [teachers, setTeachers] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [user, setUser] = useState<any>(null);
 
   const [title, setTitle] = useState("");
   const [teacherId, setTeacherId] = useState(initialTeacherId);
@@ -45,6 +46,18 @@ export default function SubmitProposal() {
   useEffect(() => {
      const token = localStorage.getItem("access_token");
      const headers = { "Authorization": `Bearer ${token}` };
+
+     // Fetch User & Role Check
+     fetch("/api/auth/me", { headers })
+       .then(r => r.json())
+       .then(data => {
+          if (data.success) {
+             setUser(data.user);
+             if (data.user.role === "STUDENT" && data.user.membership?.role !== "LEADER") {
+                router.push("/dashboard");
+             }
+          }
+       });
 
      // Fetch Faculty
      fetch("/api/faculty", { headers })
