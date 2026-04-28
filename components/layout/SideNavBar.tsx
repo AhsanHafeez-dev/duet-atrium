@@ -29,6 +29,7 @@ export default function SideNavBar({ role }: { role: string }) {
            { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
            { href: "/admin/users", label: "Manage Users", icon: "manage_accounts" },
            { href: "/admin/proposals", label: "All Proposals", icon: "description" },
+           { href: "/documents", label: "Documents", icon: "folder" },
            { href: "/admin/settings", label: "Portal Settings", icon: "settings" },
          ]
       default:

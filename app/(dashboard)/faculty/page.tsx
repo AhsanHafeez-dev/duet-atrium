@@ -11,6 +11,7 @@ function FacultyDirectoryContent() {
   const initialSearch = searchParams.get("search") || "";
   
   const [faculty, setFaculty] = useState<any[]>([]);
+  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [filterDept, setFilterDept] = useState("All");
   const [searchQuery, setSearchQuery] = useState(initialSearch);
@@ -21,9 +22,13 @@ function FacultyDirectoryContent() {
 
   useEffect(() => {
      const token = localStorage.getItem("access_token");
-     fetch("/api/faculty", {
-        headers: { "Authorization": `Bearer ${token}` }
-     })
+     const headers = { "Authorization": `Bearer ${token}` };
+
+     fetch("/api/auth/me", { headers }).then(r => r.json()).then(d => {
+        if (d.success) setUser(d.user);
+     });
+
+     fetch("/api/faculty", { headers })
        .then(r => r.json())
        .then(data => {
           if (data.success) {
@@ -97,7 +102,6 @@ function FacultyDirectoryContent() {
           ))}
         </div>
 
-        {/* Faculty Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredFaculty.map((prof) => {
              // Assumption: A teacher can supervise max 3 groups. If supervisedProposals.length >= 3, they are Full.
@@ -134,18 +138,20 @@ function FacultyDirectoryContent() {
                    </div>
                  </div>
 
-                 <Link 
-                    href={`/proposals/new?teacherId=${prof.id}`}
-                    className={`w-full py-2.5 rounded-lg text-center font-semibold transition-colors mt-auto flex justify-center items-center gap-2 ${
-                      isFull 
-                        ? "bg-surface-container text-outline cursor-not-allowed border border-[#3e495d]" 
-                        : "bg-primary text-on-primary hover:bg-primary-container shadow-lg shadow-primary/20 hover:shadow-primary/40 border border-primary/50"
-                    }`}
-                    onClick={(e) => { if(isFull) e.preventDefault(); }}
-                 >
-                    <span className="material-symbols-outlined text-sm">edit_document</span>
-                    Propose Topic
-                 </Link>
+                 {user?.role === "STUDENT" && (
+                   <Link 
+                      href={`/proposals/new?teacherId=${prof.id}`}
+                      className={`w-full py-2.5 rounded-lg text-center font-semibold transition-colors mt-auto flex justify-center items-center gap-2 ${
+                        isFull 
+                          ? "bg-surface-container text-outline cursor-not-allowed border border-[#3e495d]" 
+                          : "bg-primary text-on-primary hover:bg-primary-container shadow-lg shadow-primary/20 hover:shadow-primary/40 border border-primary/50"
+                      }`}
+                      onClick={(e) => { if(isFull) e.preventDefault(); }}
+                   >
+                      <span className="material-symbols-outlined text-sm">edit_document</span>
+                      Propose Topic
+                   </Link>
+                 )}
                </div>
              )
           })}
