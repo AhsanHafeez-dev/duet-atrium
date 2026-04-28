@@ -12,11 +12,12 @@ const PROTECTED_PATHS = [
   "/onboarding",
 ];
 
-// Write API routes exempt from portal lock (auth + lock-toggle itself)
+// Write API routes exempt from portal lock
 const LOCK_EXEMPT_PATHS = [
   "/api/auth",
   "/api/cron",
   "/api/admin/portal-lock",
+  "/api/portal-status",
 ];
 
 const WRITE_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
@@ -24,17 +25,31 @@ const WRITE_METHODS = ["POST", "PUT", "PATCH", "DELETE"];
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
-  // ── 1. Page Refirection handled by AuthGuard component ──────
-  // We no longer use server-side middleware for auth because localStorage is unreadable on the edge.
+  // ── 1. Auth guard for protected page routes ──────────────
+  const isProtectedPage = PROTECTED_PATHS.some((p) => pathname.startsWith(p));
+  if (isProtectedPage) {
+    const token = req.cookies.get("access_token")?.value;
+    if (!token) {
+      const loginUrl = new URL("/auth/login", req.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    try {
+      const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+      await jwtVerify(token, secret);
+    } catch {
+      const loginUrl = new URL("/auth/login", req.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
 
-  // ── 2. Portal lock guard for all write API calls ─────────
+  // ── 2. Portal lock guard for write API calls ─────────
   if (
     pathname.startsWith("/api/") &&
     WRITE_METHODS.includes(req.method) &&
     !LOCK_EXEMPT_PATHS.some((p) => pathname.startsWith(p))
   ) {
-    // Check portal lock status from DB via a lightweight fetch
-    // We keep this as a separate fetch to avoid importing Prisma in edge middleware
     const lockCheckUrl = new URL("/api/portal-status", req.url);
     try {
       const lockRes = await fetch(lockCheckUrl.toString(), {
@@ -54,7 +69,7 @@ export async function middleware(req: NextRequest) {
         }
       }
     } catch {
-      // If lock check fails, allow the request (fail-open)
+      // fail-open if lock check fails
     }
   }
 
@@ -62,7 +77,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|public/).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|public/).*)",],
 };
