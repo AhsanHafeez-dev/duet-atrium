@@ -42,6 +42,12 @@ export default function AdminProposalsPage() {
 
   return (
     <AuthGuard>
+      <div className="max-w-7xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">System Proposals Oversight</h1>
+          <p className="text-on-surface-variant text-sm mt-1">Review all project proposals submitted across the platform.</p>
+        </div>
+
         <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-surface-container-low p-4 rounded-2xl border border-outline-variant/10">
           <div className="relative w-full md:w-96">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-sm">search</span>
