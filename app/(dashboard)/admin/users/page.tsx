@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import AuthGuard from "@/components/auth/AuthGuard";
@@ -107,7 +107,7 @@ export default function AdminUsersPage() {
               <thead>
                 <tr className="bg-surface-container-highest/50 border-b border-[#222a3d]">
                   <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-outline">User Info</th>
-                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-outline">Role & Origin</th>
+                  <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-outline">Role &amp; Origin</th>
                   <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-outline">Status</th>
                   <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-outline text-right">Actions</th>
                 </tr>
@@ -128,14 +128,14 @@ export default function AdminUsersPage() {
                     <tr key={user.id} className="hover:bg-surface-container-highest/30 transition-colors group">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div 
+                          <div
                             onClick={() => setSelectedUser(user)}
                             className="w-10 h-10 rounded-xl bg-surface-container-highest border border-outline/10 flex items-center justify-center font-bold text-primary overflow-hidden cursor-pointer hover:border-primary transition-colors"
                           >
                             {user.profileImage ? (
-                               <img src={user.profileImage} alt="" className="w-full h-full object-cover" />
+                              <img src={user.profileImage} alt="" className="w-full h-full object-cover" />
                             ) : (
-                               user.email.charAt(0).toUpperCase()
+                              user.email.charAt(0).toUpperCase()
                             )}
                           </div>
                           <div>
@@ -177,9 +177,9 @@ export default function AdminUsersPage() {
                             </button>
                           )}
                           <button
-                             onClick={() => updateUser(user.id, { isVerified: !user.isVerified })}
-                             disabled={actionLoading === user.id}
-                             className="p-2 bg-surface-container-highest text-on-surface hover:bg-[#31394d] rounded-lg transition-colors flex items-center gap-1 text-xs font-bold border border-outline/20 disabled:opacity-50"
+                            onClick={() => updateUser(user.id, { isVerified: !user.isVerified })}
+                            disabled={actionLoading === user.id}
+                            className="p-2 bg-surface-container-highest text-on-surface hover:bg-[#31394d] rounded-lg transition-colors flex items-center gap-1 text-xs font-bold border border-outline/20 disabled:opacity-50"
                           >
                             <span className="material-symbols-outlined text-sm">{user.isVerified ? 'block' : 'undo'}</span>
                             {user.isVerified ? 'Suspend' : 'Redo'}
@@ -194,140 +194,147 @@ export default function AdminUsersPage() {
           </div>
         </div>
       </div>
- 
-       {/* User Detail Modal */}
-       {selectedUser && (
-         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setSelectedUser(null)}>
-           <div 
-             className="bg-surface-container-low border border-[#222a3d] w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200"
-             onClick={(e) => e.stopPropagation()}
-           >
-             <div className="relative h-32 bg-gradient-to-r from-primary/20 to-secondary/20">
-               <button 
-                 onClick={() => setSelectedUser(null)}
-                 className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center transition-colors backdrop-blur-md"
-               >
-                 <span className="material-symbols-outlined">close</span>
-               </button>
-             </div>
- 
-             <div className="px-8 pb-8 -mt-12 relative">
-               <div className="flex flex-col md:flex-row gap-6 items-start">
-                 <div className="w-32 h-32 rounded-3xl border-4 border-surface-container-low bg-surface-container-highest overflow-hidden shadow-xl">
-                   {selectedUser.profileImage ? (
-                     <img src={selectedUser.profileImage} alt="" className="w-full h-full object-cover" />
-                   ) : (
-                     <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-primary">
-                       {selectedUser.email.charAt(0).toUpperCase()}
-                     </div>
-                   )}
-                 </div>
- 
-                 <div className="flex-1 pt-12 md:pt-14">
-                   <h2 className="text-2xl font-bold text-on-surface">{selectedUser.email}</h2>
-                   <div className="flex items-center gap-2 mt-1">
-                     <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
-                       selectedUser.role === 'ADMIN' ? 'bg-secondary/10 text-secondary border-secondary/20' :
-                       selectedUser.role === 'TEACHER' ? 'bg-tertiary/10 text-tertiary border-tertiary/20' :
-                       'bg-primary/10 text-primary border-primary/20'
-                     }`}>
-                       {selectedUser.role}
-                     </span>
-                     {selectedUser.isVerified && (
-                       <span className="flex items-center gap-1 text-[10px] font-bold text-success uppercase tracking-widest">
-                         <span className="material-symbols-outlined text-[14px]">verified</span>
-                         Verified
-                       </span>
-                     )}
-                   </div>
-                 </div>
-               </div>
- 
-               <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
-                 <div className="space-y-6">
-                   <div>
-                     <h3 className="text-xs font-bold text-outline uppercase tracking-widest mb-3">Academic Details</h3>
-                     <div className="space-y-3">
-                       <div className="flex items-center gap-3">
-                         <span className="material-symbols-outlined text-on-surface-variant">school</span>
-                         <div>
-                           <p className="text-[10px] text-outline uppercase font-bold">Program / Designation</p>
-                           <p className="text-sm font-medium">{selectedUser.program || selectedUser.designation || "N/A"}</p>
-                         </div>
-                       </div>
-                       {selectedUser.role === "STUDENT" && (
-                         <>
-                           <div className="flex items-center gap-3">
-                             <span className="material-symbols-outlined text-on-surface-variant">fingerprint</span>
-                             <div>
-                               <p className="text-[10px] text-outline uppercase font-bold">Roll Number</p>
-                               <p className="text-sm font-medium">{selectedUser.rollNumber || "N/A"}</p>
-                             </div>
-                           </div>
-                           <div className="flex items-center gap-3">
-                             <span className="material-symbols-outlined text-on-surface-variant">calendar_today</span>
-                             <div>
-                               <p className="text-[10px] text-outline uppercase font-bold">Batch</p>
-                               <p className="text-sm font-medium">{selectedUser.batch || "N/A"}</p>
-                             </div>
-                           </div>
-                         </>
-                       )}
-                     </div>
-                   </div>
- 
-                   {selectedUser.role === "TEACHER" && selectedUser.domainTags?.length > 0 && (
-                     <div>
-                       <h3 className="text-xs font-bold text-outline uppercase tracking-widest mb-3">Expertise</h3>
-                       <div className="flex flex-wrap gap-2">
-                         {selectedUser.domainTags.map((tag: string, i: number) => (
-                           <span key={i} className="px-3 py-1 bg-surface-container-highest text-on-surface text-[11px] font-medium rounded-full border border-outline/10">
-                             {tag}
-                           </span>
-                         ))}
-                       </div>
-                     </div>
-                   )}
-                 </div>
- 
-                 <div className="space-y-6">
-                   <div>
-                     <h3 className="text-xs font-bold text-outline uppercase tracking-widest mb-3">Account Info</h3>
-                     <div className="space-y-3">
-                       <div className="flex items-center gap-3">
-                         <span className="material-symbols-outlined text-on-surface-variant">event</span>
-                           <div>
-                             <p className="text-[10px] text-outline uppercase font-bold">Joined On</p>
-                             <p className="text-sm font-medium">{new Date(selectedUser.createdAt).toLocaleDateString()}</p>
-                           </div>
-                         </div>
-                         <div className="flex items-center gap-3">
-                           <span className="material-symbols-outlined text-on-surface-variant">person_check</span>
-                           <div>
-                             <p className="text-[10px] text-outline uppercase font-bold">Verification Status</p>
-                             <p className={`text-sm font-bold ${selectedUser.isVerified ? "text-success" : "text-warning"}`}>
-                               {selectedUser.isVerified ? "Approved" : "Pending Approval"}
-                             </p>
-                           </div>
-                         </div>
-                       </div>
-                     </div>
- 
-                     {selectedUser.bio && (
-                       <div>
-                         <h3 className="text-xs font-bold text-outline uppercase tracking-widest mb-3">Biography</h3>
-                         <p className="text-sm text-on-surface-variant leading-relaxed line-clamp-4">
-                           {selectedUser.bio}
-                         </p>
-                       </div>
-                     )}
-                   </div>
-                 </div>
-               </div>
-             </div>
-           </div>
-       )}
-     </div>
+
+      {/* User Detail Modal */}
+      {selectedUser && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+          onClick={() => setSelectedUser(null)}
+        >
+          <div
+            className="bg-surface-container-low border border-[#222a3d] w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header Banner */}
+            <div className="relative h-32 bg-gradient-to-r from-primary/20 to-secondary/20">
+              <button
+                onClick={() => setSelectedUser(null)}
+                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/20 hover:bg-black/40 text-white flex items-center justify-center transition-colors backdrop-blur-md"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            <div className="px-8 pb-8 -mt-12 relative">
+              {/* Avatar + Name */}
+              <div className="flex flex-col md:flex-row gap-6 items-start">
+                <div className="w-32 h-32 rounded-3xl border-4 border-surface-container-low bg-surface-container-highest overflow-hidden shadow-xl">
+                  {selectedUser.profileImage ? (
+                    <img src={selectedUser.profileImage} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-4xl font-bold text-primary">
+                      {selectedUser.email.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 pt-12 md:pt-14">
+                  <h2 className="text-2xl font-bold text-on-surface">{selectedUser.email}</h2>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${
+                      selectedUser.role === 'ADMIN' ? 'bg-secondary/10 text-secondary border-secondary/20' :
+                      selectedUser.role === 'TEACHER' ? 'bg-tertiary/10 text-tertiary border-tertiary/20' :
+                      'bg-primary/10 text-primary border-primary/20'
+                    }`}>
+                      {selectedUser.role}
+                    </span>
+                    {selectedUser.isVerified && (
+                      <span className="flex items-center gap-1 text-[10px] font-bold text-success uppercase tracking-widest">
+                        <span className="material-symbols-outlined text-[14px]">verified</span>
+                        Verified
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Details Grid */}
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Left column */}
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-xs font-bold text-outline uppercase tracking-widest mb-3">Academic Details</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined text-on-surface-variant">school</span>
+                        <div>
+                          <p className="text-[10px] text-outline uppercase font-bold">Program / Designation</p>
+                          <p className="text-sm font-medium">{selectedUser.program || selectedUser.designation || "N/A"}</p>
+                        </div>
+                      </div>
+                      {selectedUser.role === "STUDENT" && (
+                        <>
+                          <div className="flex items-center gap-3">
+                            <span className="material-symbols-outlined text-on-surface-variant">fingerprint</span>
+                            <div>
+                              <p className="text-[10px] text-outline uppercase font-bold">Roll Number</p>
+                              <p className="text-sm font-medium">{selectedUser.rollNumber || "N/A"}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="material-symbols-outlined text-on-surface-variant">calendar_today</span>
+                            <div>
+                              <p className="text-[10px] text-outline uppercase font-bold">Batch</p>
+                              <p className="text-sm font-medium">{selectedUser.batch || "N/A"}</p>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {selectedUser.role === "TEACHER" && selectedUser.domainTags?.length > 0 && (
+                    <div>
+                      <h3 className="text-xs font-bold text-outline uppercase tracking-widest mb-3">Expertise</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {selectedUser.domainTags.map((tag: string, i: number) => (
+                          <span key={i} className="px-3 py-1 bg-surface-container-highest text-on-surface text-[11px] font-medium rounded-full border border-outline/10">
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Right column */}
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-xs font-bold text-outline uppercase tracking-widest mb-3">Account Info</h3>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined text-on-surface-variant">event</span>
+                        <div>
+                          <p className="text-[10px] text-outline uppercase font-bold">Joined On</p>
+                          <p className="text-sm font-medium">{new Date(selectedUser.createdAt).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="material-symbols-outlined text-on-surface-variant">person_check</span>
+                        <div>
+                          <p className="text-[10px] text-outline uppercase font-bold">Verification Status</p>
+                          <p className={`text-sm font-bold ${selectedUser.isVerified ? "text-success" : "text-warning"}`}>
+                            {selectedUser.isVerified ? "Approved" : "Pending Approval"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {selectedUser.bio && (
+                    <div>
+                      <h3 className="text-xs font-bold text-outline uppercase tracking-widest mb-3">Biography</h3>
+                      <p className="text-sm text-on-surface-variant leading-relaxed line-clamp-4">
+                        {selectedUser.bio}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AuthGuard>
   );
 }
