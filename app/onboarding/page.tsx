@@ -32,6 +32,7 @@ export default function OnboardingPage() {
      }).then(res => res.json()).then(data => {
         if (data.user?.role) setRole(data.user.role);
      }).catch(() => {});
+     
   }, []);
 
   const uploadFileToCloudinary = async (file: File) => {
