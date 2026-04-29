@@ -125,6 +125,7 @@ model Proposal {
   problemStatement String
   proposedStack    String[]       @default([])
   status           ProposalStatus @default(PENDING)
+  allowExtraMember Boolean        @default(false)
   rejectionComment String?
   submittedAt      DateTime       @default(now())
   respondedAt      DateTime?

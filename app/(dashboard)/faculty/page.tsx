@@ -138,7 +138,7 @@ function FacultyDirectoryContent() {
                    </div>
                  </div>
 
-                 {user?.role === "STUDENT" && (
+                 {user?.role === "STUDENT" && user?.membership?.role === "LEADER" && (
                    <Link 
                       href={`/proposals/new?teacherId=${prof.id}`}
                       className={`w-full py-2.5 rounded-lg text-center font-semibold transition-colors mt-auto flex justify-center items-center gap-2 ${

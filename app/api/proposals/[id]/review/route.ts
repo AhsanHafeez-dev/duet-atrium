@@ -14,14 +14,15 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     const payload = verifyAccessToken(token);
     if (!payload || payload.role !== "TEACHER") return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const { action, feedback } = await req.json();
+    const { action, feedback, allowExtraMember } = await req.json();
 
     if (!["approve", "reject", "revise"].includes(action)) {
        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
     const proposal = await prisma.proposal.findUnique({
-       where: { id }
+       where: { id },
+       include: { group: true }
     });
 
     if (!proposal) return NextResponse.json({ error: "Proposal not found" }, { status: 404 });
@@ -47,11 +48,20 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
           where: { id: proposal.id },
           data: {
              status: statusUpdate as any,
-             rejectionComment: feedback || null
+             rejectionComment: feedback || null,
+             allowExtraMember: !!allowExtraMember
           }
        });
 
        if (action === "approve") {
+          // If teacher allowed extra slot, update group maxSize
+          if (allowExtraMember) {
+             await tx.group.update({
+                where: { id: proposal.groupId },
+                data: { maxSize: 5 }
+             });
+          }
+
           // Reject other pending proposals for this group
           await tx.proposal.updateMany({
              where: { 

@@ -14,6 +14,7 @@ export default function ProposalReviewPage({ params }: { params: Promise<{ id: s
   const [feedback, setFeedback] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState("");
+  const [allowExtraMember, setAllowExtraMember] = useState(false);
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function ProposalReviewPage({ params }: { params: Promise<{ id: s
               "Content-Type": "application/json",
               "Authorization": `Bearer ${token}`
            },
-           body: JSON.stringify({ action, feedback })
+           body: JSON.stringify({ action, feedback, allowExtraMember })
         });
         const data = await res.json();
         
@@ -262,6 +263,16 @@ export default function ProposalReviewPage({ params }: { params: Promise<{ id: s
                        />
                     </div>
 
+                     <div className="flex items-center gap-3 mb-6 p-3 bg-surface-container rounded-xl border border-outline/10 group cursor-pointer hover:bg-surface-container-highest transition-colors" onClick={() => setAllowExtraMember(!allowExtraMember)}>
+                        <div className={`w-10 h-6 rounded-full relative transition-colors duration-300 ${allowExtraMember ? 'bg-primary' : 'bg-outline/30'}`}>
+                           <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-all duration-300 ${allowExtraMember ? 'left-5' : 'left-1'}`}></div>
+                        </div>
+                        <div>
+                           <p className="text-sm font-bold text-on-surface">Allow Extra Member Slot</p>
+                           <p className="text-[10px] text-on-surface-variant uppercase tracking-widest font-medium">Permit group to add a 5th member</p>
+                        </div>
+                     </div>
+ 
                     <div className="flex flex-col space-y-3 pt-2">
                        <button onClick={() => handleAction("approve")} disabled={actionLoading} className="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary-container rounded-lg py-3.5 px-4 font-semibold text-sm tracking-wide hover:brightness-110 transition-all flex justify-center items-center disabled:opacity-50">
                           <span className="material-symbols-outlined mr-2 text-[1.1rem]">task_alt</span>
